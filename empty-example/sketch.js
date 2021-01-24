@@ -4,19 +4,21 @@ let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 let noteTypes = [1, 2, 4, 8, 16];
 
-let aMStart = 57;
-let octaves = 3;
-let tempo = 60; //in BPM
+let octaves = 1;
+let tempo = 120; //in BPM
 let note = 8; // 8 = eighth, 4 = quarter, etc.
 
 let frameRate = 60;
 let w = 200;
 let h = 50;
 
+let ea = 0.1;
+let ed = 0.1;
+let es = 0.8;
+
 var button;
 
 function startScale(){
-  osc.start();
   midiValue = 57;
   step = 0;
   currentOctave = 1;
@@ -27,6 +29,7 @@ function playNote() {
   env.mult(0.1 * volSlider.value());
   let freqValue = midiToFreq(midiValue);
   osc.freq(freqValue);
+  osc.start();
   env.play(osc);
   print('Played' + ' ' + step + ' ' + currentOctave + ' ' + midiValue);
 }
@@ -51,7 +54,7 @@ function checkEnd() {
 function changeNoteType() {
   note = inpNoteType.value();
   let secPerNote = (60 / tempo) * (4 / note);
-  env.setADSR(0.1, 0.1, 0.8, secPerNote);
+  env.setADSR(ea, ed, es, secPerNote - 0.2);
   env.setRange(1, 0);
 }
 
@@ -62,7 +65,7 @@ function setup() {
   textAlign(CENTER, CENTER);
   text('A Major Scale', w/2, h/2);
 
-  button = createButton('start');
+  button = createButton('start/stop');
   button.mousePressed(startScale);
   volSlider = createSlider(0, 1, 0.5, 0.05);
 
