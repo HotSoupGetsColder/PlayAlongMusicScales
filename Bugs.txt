@@ -1,1 +1,2 @@
-- First note on refresh is at max volume.
+- *FIXED* First note on refresh is at max volume.
+- Note divisions is broken for 8th and 16th notes.

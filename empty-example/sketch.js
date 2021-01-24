@@ -5,7 +5,7 @@ let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 let noteTypes = [1, 2, 4, 8, 16];
 
 let octaves = 1;
-let tempo = 120; //in BPM
+let tempo = 240; //in BPM
 let note = 8; // 8 = eighth, 4 = quarter, etc.
 
 let frameRate = 60;
@@ -15,6 +15,7 @@ let h = 50;
 let ea = 0.1;
 let ed = 0.1;
 let es = 0.8;
+let er = 0.8;
 
 var button;
 
@@ -54,7 +55,7 @@ function checkEnd() {
 function changeNoteType() {
   note = inpNoteType.value();
   let secPerNote = (60 / tempo) * (4 / note);
-  env.setADSR(ea, ed, es, secPerNote - 0.2);
+  env.setADSR(ea * secPerNote, ed * secPerNote, es, er * secPerNote);
   env.setRange(1, 0);
 }
 
