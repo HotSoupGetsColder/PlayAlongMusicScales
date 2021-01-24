@@ -4,9 +4,9 @@ let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 let noteTypes = [1, 2, 4, 8, 16];
 
-let octaves = 1;
-let tempo = 240; //in BPM
-let note = 8; // 8 = eighth, 4 = quarter, etc.
+let octaves = 2;
+let tempo = 120; //in BPM
+let note = 4; // 8 = eighth, 4 = quarter, etc.
 
 let frameRate = 60;
 let w = 200;
@@ -16,6 +16,11 @@ let ea = 0.1;
 let ed = 0.1;
 let es = 0.8;
 let er = 0.8;
+let al = 1;
+let alMax = 0.10;
+
+let notesPassed = 0;
+let timeLastNote = 0;
 
 var button;
 
@@ -27,10 +32,12 @@ function startScale(){
 }
 
 function playNote() {
-  env.mult(0.1 * volSlider.value());
   let freqValue = midiToFreq(midiValue);
   osc.freq(freqValue);
   osc.start();
+  let secPerNote = (60 / tempo) * (4 / note);
+  env.setRange(alMax * al, 0);
+  env.setADSR(ea * secPerNote, ed * secPerNote, es, er * secPerNote);
   env.play(osc);
   print('Played' + ' ' + step + ' ' + currentOctave + ' ' + midiValue);
 }
@@ -54,9 +61,12 @@ function checkEnd() {
 
 function changeNoteType() {
   note = inpNoteType.value();
-  let secPerNote = (60 / tempo) * (4 / note);
-  env.setADSR(ea * secPerNote, ed * secPerNote, es, er * secPerNote);
-  env.setRange(1, 0);
+  print('Changed note to ' + note);
+}
+
+function changeVolume() {
+  al = volSlider.value();
+  print('Attack level changed to ' + al)
 }
 
 function setup() {
@@ -68,25 +78,27 @@ function setup() {
 
   button = createButton('start/stop');
   button.mousePressed(startScale);
-  volSlider = createSlider(0, 1, 0.5, 0.05);
+  volSlider = createSlider(0.05, 1, 0.5, 0.05);
+  volSlider.changed(changeVolume);
 
   inpNoteType = createSelect();
   inpNoteType.position(0, 90);
   for (var i = 0; i < noteTypes.length; i++) {
     inpNoteType.option(noteTypes[i]);
   }
-  inpNoteType.selected(4);
+  inpNoteType.selected(note);
   inpNoteType.changed(changeNoteType);
 
   osc = new p5.Oscillator('sine');
   env = new p5.Envelope();
-
-  changeNoteType();
 }
 
 function draw() {
   // put drawing code here
-  if (frameCount % ((60 / tempo) * (4 / note) * frameRate) === 0 || frameCount === 1) {
+  let timePassed = (frameCount / frameRate) + (deltaTime / 1000); //Time passed in seconds
+  let secPerNote = (60 / tempo) * (4 / note);
+  if (timePassed - timeLastNote > secPerNote) {
+    timeLastNote = timePassed;
     if (playingScale) {
       playNote();
       updateScale();

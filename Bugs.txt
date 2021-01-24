@@ -1,2 +1,8 @@
 - *FIXED* First note on refresh is at max volume.
-- Note divisions is broken for 8th and 16th notes.
+	- env.setRange() MUST come before env.setADSR()
+- *FIXED* Note divisions is broken for 8th and 16th notes.
+	- Cause: time wasn't precise b/c calculation by frame rate
+		- Time was as accurate as 1/FPS
+	- Solution: Used deltaTime to make time more precise
+		- Also changed way to trigger each note:
+		if (timePassed - timeLastNote > secPerNote) {...
