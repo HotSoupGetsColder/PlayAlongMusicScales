@@ -4,12 +4,14 @@ let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 
 let aMStart = 57;
-let octaves = 3;
-let tempo = 200; //in BPM
+let octaves = 5;
+let tempo = 400; //in BPM
 
 let frameRate = 60;
 let w = 200;
 let h = 200;
+
+var button;
 
 function startScale(){
   osc.start();
@@ -57,13 +59,14 @@ function setup() {
   textAlign(CENTER, CENTER);
   text('A Major Scale', w/2, h/2);
 
+  button = createButton('start');
+  button.mousePressed(startScale);
+
   osc = new p5.Oscillator('sine');
   env = new p5.Envelope();
   let secPerBeat = 60 / tempo;
   env.setADSR(0.1, 0.1, 0.8, secPerBeat);
   env.setRange(1, 0);
-
-  startScale();
 }
 
 function draw() {
