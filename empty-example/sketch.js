@@ -4,8 +4,8 @@ let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 
 let aMStart = 57;
-let octaves = 1;
-let tempo = 60; //in BPM
+let octaves = 3;
+let tempo = 200; //in BPM
 
 let frameRate = 60;
 let w = 200;
@@ -19,20 +19,35 @@ function startScale(){
   playingScale = true;
 }
 
-function nextOctave() {
-  currentOctave++;
-  if (currentOctave <= octaves){
+// function nextOctave() {
+//   currentOctave++;
+//   if (currentOctave <= octaves){
+//     step = 0;
+//   }
+// }
+
+function playNote() {
+  let freqValue = midiToFreq(midiValue);
+  osc.freq(freqValue);
+  env.play(osc);
+  print('Played' + ' ' + step + ' ' + currentOctave + ' ' + midiValue);
+}
+
+function updateScale() {
+  midiValue = midiValue + majorScaleSteps[step];
+  step++;
+  if (step >= majorScaleSteps.length) {
+    currentOctave++;
     step = 0;
   }
 }
 
-function updateScale() {
-  let freqValue = midiToFreq(midiValue);
-  osc.freq(freqValue);
-  env.play(osc);
-
-  midiValue = midiValue + majorScaleSteps[step];
-  step++;
+function checkEnd() {
+  if (currentOctave > octaves) {
+    if (step > 0) {
+      playingScale = false;
+    }
+  }
 }
 
 function setup() {
@@ -55,16 +70,9 @@ function draw() {
   // put drawing code here
   if (frameCount % (60 / tempo * frameRate) === 0 || frameCount === 1) {
     if (playingScale) {
+      playNote();
       updateScale();
-      if (step >= majorScaleSteps.length) {
-        nextOctave();
-      }
-      // if (step == 7 && currentOctave > octaves) {
-      //   osc.stop();
-      //   playingScale = false;
-      //   print('Scale stopped');
-      // }
-      print(step + ' ' + currentOctave + ' ' + midiValue);
+      checkEnd();
     }
   }
 }
