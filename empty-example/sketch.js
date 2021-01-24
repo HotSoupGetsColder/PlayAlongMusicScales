@@ -6,10 +6,13 @@ let noteTypes = [1, 2, 4, 8, 16];
 let octSel = [1, 2, 3, 4];
 let oscTypes = ['sine', 'triangle', 'sawtooth', 'square'];
 
-let octaves = 2;
+let octaves = 1;
 let tempo = 120; //in BPM
 let note = 4; // 8 = eighth, 4 = quarter, etc.
 let baseNote = 57;
+let scaleUp = true;
+let reverseScale = false;
+let loopScale = false;
 
 let ipMax = 10;  // ip = input placement
 let ipSpacing = 25;
@@ -22,7 +25,7 @@ for (var i = 0; i < ipMax; i++) {
 
 let frameRate = 60;
 let w = 200;
-let h = ip[ipMax - 1];
+let h = ip[ipMax - 1] + ipSpacing;
 
 let ea = 0.1;
 let ed = 0.1;
@@ -41,6 +44,7 @@ function startScale() {
   step = 0;
   currentOctave = 1;
   playingScale = true;
+  scaleUp = true;
 }
 
 function stopScale() {
@@ -59,19 +63,50 @@ function playNote() {
 }
 
 function updateScale() {
-  midiValue = midiValue + majorScaleSteps[step];
-  step++;
-  if (step >= majorScaleSteps.length) {
-    currentOctave++;
-    step = 0;
+  if (scaleUp) {
+    midiValue = midiValue + majorScaleSteps[step];
+    step++;
+    if (step >= majorScaleSteps.length) {
+      currentOctave++;
+      step = 0;
+    }
+  } else {
+    midiValue = midiValue - majorScaleSteps[step];
+    step--;
+    if (step < 0) {
+      currentOctave--;
+      step = majorScaleSteps.length - 1;
+    }
   }
 }
 
 function checkEnd() {
-  if (currentOctave > octaves) {
-    if (step > 0) {
-      playingScale = false;
+  if (scaleUp) {
+    if (currentOctave > octaves) {
+      if (step > 0) {
+        if (reverseScale) {
+          midiValue = midiValue - majorScaleSteps[0];
+          step = majorScaleSteps.length - 1
+          currentOctave = octaves;
+          scaleUp = false;
+        } else {
+          endScale();
+        }
+      }
     }
+  } else {
+      if (currentOctave < 1) {
+        if (step <= majorScaleSteps.length - 2) {
+          endScale();
+        }
+      }
+    }
+}
+
+function endScale() {
+  playingScale = false;
+  if (loopScale) {
+    startScale();
   }
 }
 
@@ -114,27 +149,17 @@ function toggleScale() {
   }
 }
 
-function loadLabels() {
-  textSize(10);
-  textAlign(RIGHT, TOP);
-  let labelX = ipX - 5;
-  let labelYShift = 5;
-  text('', labelX, ip[1] + labelYShift);
-  text('Volume', labelX, ip[2] + labelYShift - 3);
-  text('Tempo', labelX, ip[3] + labelYShift);
-  text('Note', labelX, ip[4] + labelYShift);
-  text('Octaves', labelX, ip[5] + labelYShift);
-  text('Base', labelX, ip[6] + labelYShift);
-  text('Wave', labelX, ip[7] + labelYShift);
+function changeRevScale() {
+  reverseScale = boolean(inpRev.value());
+  print('Reverse scale --> ' + reverseScale);
 }
 
-function setup() {
-  createCanvas(w, h);
-  background(100, 255, 255);
-  textSize(20);
-  textAlign(CENTER, CENTER);
-  text('Major Scales', w/2, 30);
+function changeLoopScale() {
+  loopScale = boolean(inpLoop.value());
+  print('Loop scale --> ' + loopScale);
+}
 
+function createInterface() {
   button = createButton('start / stop');
   button.position(ipX, ip[1]);
   button.mousePressed(toggleScale);
@@ -177,6 +202,48 @@ function setup() {
   inpOscType.selected(oscType);
   inpOscType.changed(changeOscType);
 
+  inpRev = createSelect();
+  inpRev.position(ipX, ip[8]);
+  inpRev.option('reverse', true);
+  inpRev.option("don't reverse", false);
+  inpRev.selected(reverseScale);
+  inpRev.changed(changeRevScale);
+
+  inpLoop = createSelect();
+  inpLoop.position(ipX, ip[9]);
+  inpLoop.option('loop', true);
+  inpLoop.option("don't loop", false);
+  inpLoop.selected(loopScale);
+  inpLoop.changed(changeLoopScale);
+}
+
+function loadLabels() {
+  textSize(10);
+  textAlign(RIGHT, TOP);
+  let labelX = ipX - 5;
+  let labelYShift = 5;
+  text('', labelX, ip[1] + labelYShift);
+  text('Volume', labelX, ip[2] + labelYShift - 3);
+  text('Tempo', labelX, ip[3] + labelYShift);
+  text('Note', labelX, ip[4] + labelYShift);
+  text('Octaves', labelX, ip[5] + labelYShift);
+  text('Base', labelX, ip[6] + labelYShift);
+  text('Wave', labelX, ip[7] + labelYShift);
+  text('Reverse', labelX, ip[8] + labelYShift);
+  text('Loop', labelX, ip[9] + labelYShift);
+
+}
+
+function setup() {
+  createCanvas(w, h);
+  colorMode(HSB);
+  background(40, 80, 255);
+  textFont('Helvetica');
+  textSize(30);
+  textAlign(CENTER, CENTER);
+  text('Major Scales', w/2, 30);
+
+  createInterface();
   loadLabels();
 
   osc = new p5.Oscillator(oscType);
