@@ -218,7 +218,7 @@ function createInterface() {
 }
 
 function loadLabels() {
-  textSize(10);
+  textSize(12);
   textAlign(RIGHT, TOP);
   let labelX = ipX - 5;
   let labelYShift = 5;
@@ -228,6 +228,7 @@ function loadLabels() {
   text('Note', labelX, ip[4] + labelYShift);
   text('Octaves', labelX, ip[5] + labelYShift);
   text('Base', labelX, ip[6] + labelYShift);
+  text('(A4 = 57)', labelX + 90, ip[6] + labelYShift);
   text('Wave', labelX, ip[7] + labelYShift);
   text('Reverse', labelX, ip[8] + labelYShift);
   text('Loop', labelX, ip[9] + labelYShift);
