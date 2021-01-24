@@ -1,16 +1,28 @@
-let osc, env, midiValue, step, currentOctave, playingScale, inpNoteType;
+let osc, env, midiValue, step, currentOctave, playingScale;
 
 let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
 let noteTypes = [1, 2, 4, 8, 16];
+let octSel = [1, 2, 3, 4];
+let oscTypes = ['sine', 'triangle', 'sawtooth', 'square'];
 
 let octaves = 2;
 let tempo = 120; //in BPM
 let note = 4; // 8 = eighth, 4 = quarter, etc.
+let baseNote = 57;
+
+let ipMax = 10;  // ip = input placement
+let ipSpacing = 25;
+let ipStart = 30;
+let ipX = 55;
+let ip = new Array(ipMax);
+for (var i = 0; i < ipMax; i++) {
+  ip[i] = ipStart + i * ipSpacing;
+}
 
 let frameRate = 60;
 let w = 200;
-let h = 50;
+let h = ip[ipMax - 1];
 
 let ea = 0.1;
 let ed = 0.1;
@@ -19,16 +31,20 @@ let er = 0.8;
 let al = 1;
 let alMax = 0.10;
 
+let oscType = 'sine';
+
 let notesPassed = 0;
 let timeLastNote = 0;
 
-var button;
-
-function startScale(){
-  midiValue = 57;
+function startScale() {
+  midiValue = baseNote;
   step = 0;
   currentOctave = 1;
   playingScale = true;
+}
+
+function stopScale() {
+  playingScale = false;
 }
 
 function playNote() {
@@ -66,7 +82,50 @@ function changeNoteType() {
 
 function changeVolume() {
   al = volSlider.value();
-  print('Attack level changed to ' + al)
+  print('Attack level changed to ' + al);
+}
+
+function changeOctaves() {
+  octaves = inpOct.value();
+  print('Octaves changed to ' + octaves);
+}
+
+function changeTempo() {
+  tempo = int(inpTemp.value());
+  print('Tempo changed to ' + tempo);
+}
+
+function changeBaseNote() {
+  baseNote = int(inpBaseNote.value());
+  print('Base note changed to ' + baseNote);
+}
+
+function changeOscType() {
+  oscType = inpOscType.value();
+  osc.setType(oscType);
+  print('Osc. type changed to ' + oscType);
+}
+
+function toggleScale() {
+  if (!playingScale) {
+    startScale();
+  } else {
+    stopScale();
+  }
+}
+
+function loadLabels() {
+  textSize(10);
+  textAlign(RIGHT, TOP);
+  let labelX = ipX - 5;
+  let labelYShift = 5;
+  text('', labelX, ip[1] + labelYShift);
+  text('Volume', labelX, ip[2] + labelYShift - 3);
+  text('Tempo', labelX, ip[3] + labelYShift);
+  text('Note', labelX, ip[4] + labelYShift);
+  text('Octaves', labelX, ip[5] + labelYShift);
+  text('Base', labelX, ip[6] + labelYShift);
+  text('Wave', labelX, ip[7] + labelYShift);
 }
 
 function setup() {
@@ -74,22 +133,53 @@ function setup() {
   background(100, 255, 255);
   textSize(20);
   textAlign(CENTER, CENTER);
-  text('A Major Scale', w/2, h/2);
+  text('Major Scales', w/2, 30);
 
-  button = createButton('start/stop');
-  button.mousePressed(startScale);
+  button = createButton('start / stop');
+  button.position(ipX, ip[1]);
+  button.mousePressed(toggleScale);
+
   volSlider = createSlider(0.05, 1, 0.5, 0.05);
+  volSlider.position(ipX, ip[2]);
   volSlider.changed(changeVolume);
 
   inpNoteType = createSelect();
-  inpNoteType.position(0, 90);
+  inpNoteType.position(ipX, ip[4]);
   for (var i = 0; i < noteTypes.length; i++) {
-    inpNoteType.option(noteTypes[i]);
+    inpNoteType.option("1/" + str(noteTypes[i]),noteTypes[i]);
   }
   inpNoteType.selected(note);
   inpNoteType.changed(changeNoteType);
 
-  osc = new p5.Oscillator('sine');
+  inpOct = createSelect();
+  inpOct.position(ipX, ip[5]);
+  for (var i = 0; i < octSel.length; i++) {
+    inpOct.option(octSel[i]);
+  }
+  inpOct.selected(octaves);
+  inpOct.changed(changeOctaves);
+
+  inpTemp = createInput('120');
+  inpTemp.position(ipX + 3, ip[3]);
+  inpTemp.size(25);
+  inpTemp.changed(changeTempo);
+
+  inpBaseNote = createInput(str(baseNote));
+  inpBaseNote.position(ipX + 3, ip[6]);
+  inpBaseNote.size(20);
+  inpBaseNote.changed(changeBaseNote);
+
+  inpOscType = createSelect();
+  inpOscType.position(ipX, ip[7]);
+  for (var i = 0; i < oscTypes.length; i++) {
+    inpOscType.option(oscTypes[i]);
+  }
+  inpOscType.selected(oscType);
+  inpOscType.changed(changeOscType);
+
+  loadLabels();
+
+  osc = new p5.Oscillator(oscType);
   env = new p5.Envelope();
 }
 
