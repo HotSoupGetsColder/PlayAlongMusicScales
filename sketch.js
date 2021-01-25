@@ -13,10 +13,10 @@ let baseNote = 57;
 let scaleUp = true;
 let reverseScale = false;
 let loopScale = false;
-let playPickup = false;
+let playPickup = true;
 let pickupCount = 4;
 
-let ipMax = 10;  // ip = input placement
+let ipMax = 13;  // ip = input placement
 let ipSpacing = 25;
 let ipStart = 30;
 let ipX = 55;
@@ -46,7 +46,7 @@ let timeLastNote = 0;
 //////////////////////////////////////////////////////
 
 function preload() {
-  // cowBell = loadSound('sounds/cowBell.mp3');
+  cowBell = loadSound('sounds/cowBell.mp3');
 }
 
 function startScale() {
@@ -168,6 +168,8 @@ function changeOscType() {
 }
 
 function toggleScale() {
+  osc.freq(0, 0.1);
+  osc.start();
   if (!playingScale) {
     pressPlay();
   } else {
@@ -184,6 +186,21 @@ function changeLoopScale() {
   loopScale = boolean(inpLoop.value());
   print('Loop scale --> ' + loopScale);
 }
+
+function changePU() {
+  playPickup = boolean(inpPU.value());
+  print('Play pickup --> ' + playPickup);
+}
+
+function changePUCount() {
+  pickupCount = int(inpPUCount.value());
+  print('Pickup count --> ' + pickupCount);
+}
+
+//////////////////////////////////////////////////////
+// Create Buttons
+//////////////////////////////////////////////////////
+
 
 function createInterface() {
   button = createButton('start / stop');
@@ -241,6 +258,18 @@ function createInterface() {
   inpLoop.option("don't loop", false);
   inpLoop.selected(loopScale);
   inpLoop.changed(changeLoopScale);
+
+  inpPU = createSelect();
+  inpPU.position(ipX, ip[10]);
+  inpPU.option('play', true);
+  inpPU.option("don't play", false);
+  inpPU.selected(playPickup);
+  inpPU.changed(changePU);
+
+  inpPUCount = createInput(str(pickupCount));
+  inpPUCount.position(ipX, ip[11]);
+  inpPUCount.size(20);
+  inpPUCount.changed(changePUCount);
 }
 
 function loadLabels() {
@@ -254,11 +283,12 @@ function loadLabels() {
   text('Note', labelX, ip[4] + labelYShift);
   text('Octaves', labelX, ip[5] + labelYShift);
   text('Base', labelX, ip[6] + labelYShift);
-  text('(A4 = 57)', labelX + 90, ip[6] + labelYShift);
+    text('(A4 = 57)', labelX + 90, ip[6] + labelYShift);
   text('Wave', labelX, ip[7] + labelYShift);
   text('Reverse', labelX, ip[8] + labelYShift);
   text('Loop', labelX, ip[9] + labelYShift);
-
+  text('Pickup', labelX, ip[10] + labelYShift);
+  text('PU #', labelX, ip[11] + labelYShift);
 }
 
 //////////////////////////////////////////////////////
@@ -279,11 +309,6 @@ function setup() {
 
   osc = new p5.Oscillator(oscType);
   env = new p5.Envelope();
-
-  tOsc = new p5.Oscillator('sine');
-  tOsc.start();
-  tOsc.freq(440, 0.1);
-  tOsc.amp(1, 0.1);
 }
 
 function draw() {
@@ -295,7 +320,7 @@ function draw() {
     if (playingScale) {
       if (playingPickup) {
         print('play pickup ' + pickupIndex);
-        // cowBell.play();
+        cowBell.play(undefined, undefined, 0.1);
         pickupIndex++;
         if (pickupIndex > pickupCount) {
           playingPickup = false;

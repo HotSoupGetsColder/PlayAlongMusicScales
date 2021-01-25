@@ -6,3 +6,6 @@
 	- Solution: Used deltaTime to make time more precise
 		- Also changed way to trigger each note:
 		if (timePassed - timeLastNote > secPerNote) {...
+- *FIXED* Sound doesn't play in local server
+	- Cause: stricter browsers don't play audio unless triggered by user.
+	- Solution: start osc. when play/pause button is pressed.
