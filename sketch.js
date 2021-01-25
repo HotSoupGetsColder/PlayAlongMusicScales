@@ -13,13 +13,13 @@ let baseNote = 57;
 let scaleUp = true;
 let reverseScale = false;
 let loopScale = false;
-let playPickup = true;
+let playPickup = false;
 let pickupCount = 4;
 
 let ipMax = 10;  // ip = input placement
 let ipSpacing = 25;
-let ipStart = 35;
-let ipX = 68;
+let ipStart = 30;
+let ipX = 55;
 let ip = new Array(ipMax);
 for (var i = 0; i < ipMax; i++) {
   ip[i] = ipStart + i * ipSpacing;
@@ -246,8 +246,8 @@ function createInterface() {
 function loadLabels() {
   textSize(12);
   textAlign(RIGHT, TOP);
-  let labelX = ipX - 15;
-  let labelYShift = -5;
+  let labelX = ipX - 5;
+  let labelYShift = + 4;
   text('', labelX, ip[1] + labelYShift);
   text('Volume', labelX, ip[2] + labelYShift - 3);
   text('Tempo', labelX, ip[3] + labelYShift);
