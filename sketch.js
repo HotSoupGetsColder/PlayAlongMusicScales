@@ -279,6 +279,11 @@ function setup() {
 
   osc = new p5.Oscillator(oscType);
   env = new p5.Envelope();
+
+  tOsc = new p5.Oscillator('sine');
+  tOsc.start();
+  tOsc.freq(440, 0.1);
+  tOsc.amp(1, 0.1);
 }
 
 function draw() {
