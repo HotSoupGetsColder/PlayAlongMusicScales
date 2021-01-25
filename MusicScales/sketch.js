@@ -1,4 +1,4 @@
-let osc, env, midiValue, step, currentOctave, playingScale;
+let osc, env, midiValue, step, currentOctave, playingScale, playingPickup, pickupIndex;
 
 let scaleArray = [57, 59, 61, 62, 64, 66, 68, 69];
 let majorScaleSteps = [2, 2, 1, 2, 2, 2, 1];
@@ -13,6 +13,8 @@ let baseNote = 57;
 let scaleUp = true;
 let reverseScale = false;
 let loopScale = false;
+let playPickup = true;
+let pickupCount = 4;
 
 let ipMax = 10;  // ip = input placement
 let ipSpacing = 25;
@@ -39,6 +41,14 @@ let oscType = 'sine';
 let notesPassed = 0;
 let timeLastNote = 0;
 
+//////////////////////////////////////////////////////
+// Functions
+//////////////////////////////////////////////////////
+
+function preload() {
+  // cowBell = loadSound('sounds/cowBell.mp3');
+}
+
 function startScale() {
   midiValue = baseNote;
   step = 0;
@@ -49,6 +59,18 @@ function startScale() {
 
 function stopScale() {
   playingScale = false;
+}
+
+function pressPlay() {
+  startScale();
+  if (playPickup) {
+    playingPickup = true;
+    pickupIndex = 1;
+    print('start pickup');
+  } else {
+    playingPickup = false;
+    print("don't start pickup");
+  }
 }
 
 function playNote() {
@@ -110,6 +132,10 @@ function endScale() {
   }
 }
 
+//////////////////////////////////////////////////////
+// Button Functions
+//////////////////////////////////////////////////////
+
 function changeNoteType() {
   note = inpNoteType.value();
   print('Changed note to ' + note);
@@ -143,7 +169,7 @@ function changeOscType() {
 
 function toggleScale() {
   if (!playingScale) {
-    startScale();
+    pressPlay();
   } else {
     stopScale();
   }
@@ -235,6 +261,10 @@ function loadLabels() {
 
 }
 
+//////////////////////////////////////////////////////
+// Main Code
+//////////////////////////////////////////////////////
+
 function setup() {
   createCanvas(w, h);
   colorMode(HSB);
@@ -258,9 +288,18 @@ function draw() {
   if (timePassed - timeLastNote > secPerNote) {
     timeLastNote = timePassed;
     if (playingScale) {
-      playNote();
-      updateScale();
-      checkEnd();
+      if (playingPickup) {
+        print('play pickup ' + pickupIndex);
+        // cowBell.play();
+        pickupIndex++;
+        if (pickupIndex > pickupCount) {
+          playingPickup = false;
+        }
+      } else {
+        playNote();
+        updateScale();
+        checkEnd();
+      }
     }
   }
 }
