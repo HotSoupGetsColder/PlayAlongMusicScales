@@ -289,6 +289,10 @@ function loadLabels() {
   text('Loop', labelX, ip[9] + labelYShift);
   text('Pickup', labelX, ip[10] + labelYShift);
   text('PU #', labelX, ip[11] + labelYShift);
+
+  let ghLink = createA('https://github.com/HotSoupGetsColder/PlayAlongMusicScales', 'Github link');
+  ghLink.position((w / 2) - (ghLink.width / 2) - 5, h + 5);
+  print(ghLink.width);
 }
 
 //////////////////////////////////////////////////////
