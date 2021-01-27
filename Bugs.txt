@@ -9,3 +9,6 @@
 - *FIXED* Sound doesn't play in local server
 	- Cause: stricter browsers don't play audio unless triggered by user.
 	- Solution: start osc. when play/pause button is pressed.
+- *FIXED* Github link doesn't display properly on Github Pages.
+	- Sol: Refreshed the page
+- Pickup doesn't play only on the down beats.

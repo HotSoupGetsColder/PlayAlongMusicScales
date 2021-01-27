@@ -34,11 +34,11 @@ let ed = 0.1;
 let es = 0.8;
 let er = 0.8;
 let al = 1;
-let alMax = 0.10;
+let alMax = 0.2;
 
 let oscType = 'sine';
 
-let notesPassed = 0;
+let noteInMeasure;
 let timeLastNote = 0;
 
 //////////////////////////////////////////////////////
@@ -63,6 +63,7 @@ function stopScale() {
 
 function pressPlay() {
   startScale();
+  noteInMeasure = 0;
   if (playPickup) {
     playingPickup = true;
     pickupIndex = 1;
@@ -321,6 +322,11 @@ function draw() {
   let secPerNote = (60 / tempo) * (4 / note);
   if (timePassed - timeLastNote > secPerNote) {
     timeLastNote = timePassed;
+    noteInMeasure++;
+    if (noteInMeasure > note) {
+      noteInMeasure = 1;
+    }
+    print(noteInMeasure);
     if (playingScale) {
       if (playingPickup) {
         print('play pickup ' + pickupIndex);
