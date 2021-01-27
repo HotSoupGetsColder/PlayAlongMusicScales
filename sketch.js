@@ -38,8 +38,10 @@ let alMax = 0.2;
 
 let oscType = 'sine';
 
-let noteInMeasure;
 let timeLastNote = 0;
+let timeLastSixNote = 0;
+let sixNotesPlayed;
+let triggerScale;
 
 //////////////////////////////////////////////////////
 // Functions
@@ -63,7 +65,8 @@ function stopScale() {
 
 function pressPlay() {
   startScale();
-  noteInMeasure = 0;
+  sixNotesPlayed = 0;
+  triggerScale = false;
   if (playPickup) {
     playingPickup = true;
     pickupIndex = 1;
@@ -228,7 +231,7 @@ function createInterface() {
   inpOct.selected(octaves);
   inpOct.changed(changeOctaves);
 
-  inpTemp = createInput('120');
+  inpTemp = createInput(str(tempo));
   inpTemp.position(ipX + 3, ip[3]);
   inpTemp.size(25);
   inpTemp.changed(changeTempo);
@@ -293,7 +296,6 @@ function loadLabels() {
 
   let ghLink = createA('https://github.com/HotSoupGetsColder/PlayAlongMusicScales', 'Github link');
   ghLink.position((w / 2) - (ghLink.width / 2) - 5, h + 5);
-  print(ghLink.width);
 }
 
 //////////////////////////////////////////////////////
@@ -319,26 +321,31 @@ function setup() {
 function draw() {
   // put drawing code here
   let timePassed = (frameCount / frameRate) + (deltaTime / 1000); //Time passed in seconds
-  let secPerNote = (60 / tempo) * (4 / note);
-  if (timePassed - timeLastNote > secPerNote) {
-    timeLastNote = timePassed;
-    noteInMeasure++;
-    if (noteInMeasure > note) {
-      noteInMeasure = 1;
-    }
-    print(noteInMeasure);
+
+  let secPerSixNote = (60 / tempo) * (4 / 16);
+  if (timePassed - timeLastSixNote > secPerSixNote) {
+    timeLastSixNote = timePassed;
+    sixNotesPlayed++;
+
     if (playingScale) {
-      if (playingPickup) {
-        print('play pickup ' + pickupIndex);
-        cowBell.play(undefined, undefined, 0.1);
-        pickupIndex++;
-        if (pickupIndex > pickupCount) {
+      if (sixNotesPlayed % 4 == 1) {
+        if (triggerScale) {
           playingPickup = false;
         }
-      } else {
-        playNote();
-        updateScale();
-        checkEnd();
+        if (playingPickup) {
+          cowBell.play(undefined, undefined, 0.1);
+          pickupIndex++;
+          if (pickupIndex > pickupCount) {
+            triggerScale = true;
+          }
+        }
+      }
+      if (sixNotesPlayed % (16 / note) == 1 || note == 16) {
+        if (!playingPickup) {
+          playNote();
+          updateScale();
+          checkEnd();
+        }
       }
     }
   }
