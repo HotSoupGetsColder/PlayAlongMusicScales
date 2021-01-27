@@ -15,6 +15,7 @@ let reverseScale = false;
 let loopScale = false;
 let playPickup = true;
 let pickupCount = 4;
+let playMet = true;
 
 let ipMax = 13;  // ip = input placement
 let ipSpacing = 25;
@@ -201,6 +202,11 @@ function changePUCount() {
   print('Pickup count --> ' + pickupCount);
 }
 
+function changePlayMet() {
+  playMet = boolean(inpPlayMet.value());
+  print('Play metrinome --> ' + playMet);
+}
+
 //////////////////////////////////////////////////////
 // Create Buttons
 //////////////////////////////////////////////////////
@@ -274,6 +280,13 @@ function createInterface() {
   inpPUCount.position(ipX, ip[11]);
   inpPUCount.size(20);
   inpPUCount.changed(changePUCount);
+
+  inpPlayMet = createSelect();
+  inpPlayMet.position(ipX, ip[12]);
+  inpPlayMet.option('play metrinome', true);
+  inpPlayMet.option("don't play", false);
+  inpPlayMet.selected(playMet);
+  inpPlayMet.changed(changePlayMet);
 }
 
 function loadLabels() {
@@ -293,6 +306,8 @@ function loadLabels() {
   text('Loop', labelX, ip[9] + labelYShift);
   text('Pickup', labelX, ip[10] + labelYShift);
   text('PU #', labelX, ip[11] + labelYShift);
+  text('Met.', labelX, ip[12] + labelYShift);
+
 
   let ghLink = createA('https://github.com/HotSoupGetsColder/PlayAlongMusicScales', 'Github link');
   ghLink.position((w / 2) - (ghLink.width / 2) - 5, h + 5);
@@ -338,6 +353,8 @@ function draw() {
           if (pickupIndex > pickupCount) {
             triggerScale = true;
           }
+        } else if (playMet) {
+          cowBell.play(undefined, undefined, 0.02);
         }
       }
       if (sixNotesPlayed % (16 / note) == 1 || note == 16) {
