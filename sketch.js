@@ -283,7 +283,7 @@ function createInterface() {
 
   inpPlayMet = createSelect();
   inpPlayMet.position(ipX, ip[12]);
-  inpPlayMet.option('play metrinome', true);
+  inpPlayMet.option('play metronome', true);
   inpPlayMet.option("don't play", false);
   inpPlayMet.selected(playMet);
   inpPlayMet.changed(changePlayMet);
@@ -300,7 +300,9 @@ function loadLabels() {
   text('Note', labelX, ip[4] + labelYShift);
   text('Octaves', labelX, ip[5] + labelYShift);
   text('Base', labelX, ip[6] + labelYShift);
-    text('(A4 = 57)', labelX + 90, ip[6] + labelYShift);
+    text('def=A4', labelX + 75, ip[6] + labelYShift);
+    let chartLink = createA('http://computermusicresource.com/midikeys.html', 'note chart');
+    chartLink.position(labelX + 80, ip[6] + labelYShift - 3.5);
   text('Wave', labelX, ip[7] + labelYShift);
   text('Reverse', labelX, ip[8] + labelYShift);
   text('Loop', labelX, ip[9] + labelYShift);
